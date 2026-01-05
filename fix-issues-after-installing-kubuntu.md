@@ -57,13 +57,52 @@ net.ipv6.conf.lo.disable_ipv6 = 1
 2. **Persistence**: Go to **Colors & Themes** -> **Login Screen (SDDM)** and click **Apply Plasma Settings...**. This ensures your keyboard layout and NumLock state work at the login screen.
 3. **Restart for changes to take effect.**
 
-## 4. Professional Software Suite
+## 4. Performance Tuning (Ryzen & 32GB RAM)
 
-### Browsers (Native .deb)
+### Swappiness Tuning
+With 32GB of RAM, you want the system to avoid using the slow SSD swap as much as possible.
 
-Installed via terminal to ensure high performance and native system integration:
-* **Google Chrome**: `sudo apt install ./google-chrome-stable_current_amd64.deb`
-* **Brave**: Official Brave APT repository.
+```bash
+# Set swappiness to 10 (default is 60)
+sudo sysctl vm.swappiness=10
+# Make it permanent
+echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
+```
+
+### Feral GameMode
+Essential for Godot and Blender to ensure the CPU stays in high-performance mode during heavy tasks.
+
+```bash
+sudo apt install gamemode
+# To use: launch apps with 'gamemoderun' or add to launch options
+```
+
+## 5. Professional Software Suite
+
+### Browsers (Native .deb) & Hardware Acceleration
+
+Installed via terminal to ensure high performance. To ensure smooth video playback and 3D performance in browsers, the Mesa drivers and GPU acceleration platform must be present.
+
+```bash
+# Install Browsers
+sudo apt install ./google-chrome-stable_current_amd64.deb
+
+# Ensure GPU Acceleration (Mesa/VA-API drivers)
+sudo apt install mesa-va-drivers libva-drm2 libva-x11-2
+```
+
+### Git Configuration
+
+To fix the "Please tell me who you are" error when committing code:
+
+```bash
+# Set your identity globally
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+# Verify settings
+git config --list
+```
 
 ### Creative & Dev Tools (Flatpak)
 
@@ -72,7 +111,7 @@ Installed via Flatpak to get the absolute latest stable versions (e.g., Blender 
 ```bash
 # Setup
 sudo apt install flatpak
-flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak remote-add --if-not-exists flathub [https://dl.flathub.org/repo/flathub.flatpakrepo](https://dl.flathub.org/repo/flathub.flatpakrepo)
 
 # App Installation
 flatpak install flathub org.blender.Blender      # v5.0
@@ -80,6 +119,9 @@ flatpak install flathub org.kde.krita            # Latest
 flatpak install flathub com.google.AndroidStudio # Latest
 flatpak install flathub org.godotengine.Godot    # v4.5.1
 flatpak install flathub com.github.tchx84.Flatseal
+
+# Essential GPU Driver for Flatpaks (Option 6 in prompt)
+flatpak install flathub org.freedesktop.Platform.GL.default//24.08
 ```
 
 **Restart for changes to take effect.**
@@ -92,7 +134,7 @@ To allow these apps to see your project files without "Permission Denied" errors
 sudo flatpak override --filesystem=home
 ```
 
-## 5. Maintenance & Updates
+## 6. Maintenance & Updates
 
 Run this weekly to keep the system, browsers, and creative tools current:
 
