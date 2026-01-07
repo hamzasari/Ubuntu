@@ -41,9 +41,10 @@ net.ipv6.conf.lo.disable_ipv6 = 1
 ```
 
 2. Apply with: `sudo sysctl -p /etc/sysctl.d/99-disable-ipv6.conf`
-3. Edit `/etc/default/grub` and add `ipv6.disable=1` to the `GRUB_CMDLINE_LINUX_DEFAULT` line.
+3. Edit `/etc/default/grub` and add `ipv6.disable=1` and `pcie_aspm=off` to the `GRUB_CMDLINE_LINUX_DEFAULT` line.
+   Example: `GRUB_CMDLINE_LINUX_DEFAULT='quiet splash ipv6.disable=1 pcie_aspm=off'`
 4. Finalize with: `sudo update-grub`
-5. **Restart for changes to take effect.**
+5. **Restart for changes to take effect.** `sudo reboot`
 
 ## 3. Desktop & Input Customization (Mac Style)
 
