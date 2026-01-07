@@ -147,3 +147,20 @@ sudo apt update && sudo apt upgrade -y && flatpak update -y && flatpak uninstall
 * [ ] **TODO 1**: After Wi-Fi/GRUB changes — **RESTART** (to kill IPv6 and lock 5GHz).
 * [ ] **TODO 2**: After Flatpak installation — **RESTART** (to make application icons appear in the menu).
 * [ ] **TODO 3**: After SDDM configuration — **RESTART** (to test Numpad Enter on login).
+
+## 7. Disable Wi-Fi Power Management (Most Likely Fix)
+This is the most common resolution for Wi-Fi cards disappearing during streaming.
+
+1. Open your terminal (Ctrl+Alt+T).
+
+2. Open the configuration file: sudo nano /etc/NetworkManager/conf.d/default-wifi-powersave-on.conf
+
+3. Change the value from wifi.powersave = 3 to wifi.powersave = 2.
+
+4. Save and exit (Ctrl+O, Enter, Ctrl+X), then restart your network: sudo systemctl restart NetworkManager
+
+## 8. DON'T INSTALL SPOTIFY
+
+- Use the web player
+- deb, snap, flatpak packages causes network issues
+   
