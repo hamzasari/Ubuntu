@@ -97,6 +97,8 @@ sudo apt install mesa-va-drivers libva-drm2 libva-x11-2
 To fix the "Please tell me who you are" error when committing code:
 
 ```bash
+sudo dnf install git
+
 # Set your identity globally
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
@@ -164,4 +166,53 @@ This is the most common resolution for Wi-Fi cards disappearing during streaming
 
 - Use the web player
 - deb, snap, flatpak packages causes network issues
-   
+
+## 9. Apply RTW89 Driver Tweaks
+The 8852BE uses the rtw89 driver. You can disable certain PCIe power-saving features (ASPM) that often interfere with Realtek cards on Linux. 
+- Create a driver config file:
+   ```
+   sudo nano /etc/modprobe.d/rtw89.conf
+   ```
+- Paste these options:
+   ```
+   options rtw89_pci disable_aspm_l1=y disable_aspm_l1ss=y
+   options rtw89_core disable_ps_mode=y
+   ```
+   _(Note: disable_ps_mode=y is a second layer of power-save disabling at the driver core level)_
+- Save (Ctrl+O, Enter) and Exit (Ctrl+X).
+- Reboot your system to apply these hardware-level changes.
+
+## 10. Set the Correct Regulatory Domain
+Linux sometimes restricts Wi-Fi power or available channels if it doesn't know your country's regulations. Setting this can occasionally "unblock" higher transmit power. 
+- Check current domain: `iw reg get`
+- Set it manually: `sudo iw reg set US` (Replace US with your ISO 3166-1 alpha-2 country code).
+
+## 11. Changing Band Preference
+Your nmcli command is partially correct. Setting it to a tells NetworkManager to prefer the 5GHz band. However, if your router uses the same name (SSID) for both 2.4GHz and 5GHz, the card might still drift back to 2.4GHz if the signal is "stronger" (even if it's slower).  
+
+To make it more robust, use these three commands (replace `Your_WiFi_Name` with your actual connection name):
+
+- Prefer 5GHz: `sudo nmcli connection modify "Your_WiFi_Name" 802-11-wireless.band a`
+- Ensure it stays on 5GHz: (Optional) If you want to force it and never use 2.4GHz for this specific network, run:
+  
+  `sudo nmcli connection modify "Your_WiFi_Name" 802-11-wireless.band a`
+- Apply: `sudo nmcli connection up "Your_WiFi_Name"`
+
+## 12. Checking Firmware
+You are right to check before updating. On Fedora, "firmware" for Wi-Fi cards comes in the `linux-firmware` package. 
+
+- Check the installed package version:
+`rpm -q linux-firmware`
+- Check what the card is actually using right now:
+`dmesg | grep rtw89`  
+Look for a line that says `loaded firmware rtw89/rtw8852b_fw-1.bin` and a corresponding Firmware version number (e.g., `0.29.x.x`).
+- Check for available updates:
+`sudo dnf check-update linux-firmware`  
+If it returns nothing, you are already on the latest version provided by Fedora for your release. 
+
+## Final Verification
+To see if your signal strength is actually improving in real-time, run:
+
+`watch -n 1 "nmcli dev wifi list | grep '*'"`
+
+This will show you the BARS, SIGNAL (higher is better), and RATE (speed) every second.
